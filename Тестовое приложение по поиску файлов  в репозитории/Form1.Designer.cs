@@ -49,6 +49,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.stop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -240,6 +241,16 @@
             this.pictureBox2.TabIndex = 23;
             this.pictureBox2.TabStop = false;
             // 
+            // stop
+            // 
+            this.stop.Location = new System.Drawing.Point(682, 85);
+            this.stop.Name = "stop";
+            this.stop.Size = new System.Drawing.Size(97, 57);
+            this.stop.TabIndex = 24;
+            this.stop.Text = "Стоп";
+            this.stop.UseVisualStyleBackColor = true;
+            this.stop.Click += new System.EventHandler(this.stop_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.search;
@@ -247,6 +258,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(190)))));
             this.ClientSize = new System.Drawing.Size(791, 366);
+            this.Controls.Add(this.stop);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBoxActualDirectory);
             this.Controls.Add(this.TextBoxCounter);
@@ -302,5 +314,6 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Button stop;
     }
 }

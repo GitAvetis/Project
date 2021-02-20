@@ -15,6 +15,8 @@ namespace Тестовое_приложение_по_поиску_файлов__
         private string ActualDirectory{ get; set; }
         private int CounterOfMatches { get; set; }
         private bool FileFounded { get; set; }
+        private bool ReadyToStart { get; set; }
+        private bool Stop { get; set; }
         private int SearchFormat { get; set; }
 
         public Form1()
@@ -27,13 +29,14 @@ namespace Тестовое_приложение_по_поиску_файлов__
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
 
+            ReadyToStart = true;
+            Stop = false;
             TextBoxTime.Text = "0h:0m:0s:0ms";
             
         }
        
         public void RecursionSearch(string fileName,string fileExtension, string path, List<string> accesibleDirectorys, bool IsWithRecursion)
         {
-           
             if (IsWithRecursion == true)//If folder from path contains more folders, programm will chek that folders too
             {
                 foreach (var folder in accesibleDirectorys)
@@ -85,11 +88,14 @@ namespace Тестовое_приложение_по_поиску_файлов__
                             }
 
                             break;
+                        case 4:
+                            break;
+
 
                     }
 
                 }
-                    
+
             }
             else//Folder from path haven't contains any folders inside.Programm will chek only folder from path
             {
@@ -127,12 +133,16 @@ namespace Тестовое_приложение_по_поиску_файлов__
                         }
 
                         break;
+                    case 4:
+                        break;
                 }
-  
+
             }
+
+           
            
         }
-        public void АccessibleDirectory(string path, string fileName, string fileExtension)//Creat list of accessible directorys and searching files only in folders from that list
+        public void АccessibleDirectory(string path, string fileName, string fileExtension)//Create list of accessible directorys and searching files only in folders from that list
         {
 
             List<string> directoris = Directory.GetDirectories(path).ToList();
@@ -160,109 +170,126 @@ namespace Тестовое_приложение_по_поиску_файлов__
             }
 
             if (accesibleDirectorys.Count == 0)//we have only one folder for searching files
-                RecursionSearch(fileName, fileExtension, path, accesibleDirectorys, IsWithRecursion: false);     
+                RecursionSearch(fileName, fileExtension, path, accesibleDirectorys, IsWithRecursion: false);
+            
+            else if (accesibleDirectorys.Count != 0 && FileFounded == false && Stop==false)//we have many folders for searching files and will cheking them one by one
 
-            else if(accesibleDirectorys.Count!=0 && FileFounded == false)//we have many folders for searching files and will cheking them one by one
-                RecursionSearch(fileName, fileExtension, path, accesibleDirectorys, IsWithRecursion: true);
+                    RecursionSearch(fileName, fileExtension, path, accesibleDirectorys, IsWithRecursion: true); 
+            
             
         }  
 
         private async void Search_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.Timer FormTimer = new System.Windows.Forms.Timer
+            if (ReadyToStart == true)
             {
-                Interval = 1
-            };
-            FileFounded = false;
-            SearchFormat = 0;
+                ReadyToStart = false;
 
-            if (textBoxFileName.Text.Equals("") & textBoxFileExtension.Text.Equals(""))
-                MessageBox.Show("Укажите параметры для поиска");
-            else if (textBoxPathString.Text.Length == 0)
-                MessageBox.Show("Выберите начальную директорию поиска");
-            else
-            {
-                //Choosing format of searching by the input information  
-                if (textBoxFileName.Text.Equals("") == false && textBoxFileExtension.Text.Equals("") == false)
-                    SearchFormat = 1;//Format, if u entered file name and file extension
-                else if (textBoxFileName.Text.Equals("") == false && textBoxFileExtension.Text.Equals("") == true)
-                    SearchFormat = 2;//Format, if u entered only file name
-                else if (textBoxFileName.Text.Equals("") == true && textBoxFileExtension.Text.Equals("") == false)
-                    SearchFormat = 3; //Format, if u entered only file extension
-
-                treeView1.Nodes.Clear();
-                SearchResult = null;
-                ActualDirectory = null;
-
-                TextBoxTime.Text = "0h:0m:0s:0ms";
-                int milSec, sec, min, hour;
-                milSec = sec = min = hour = 0;
-
-                FormTimer.Start();
-                FormTimer.Tick += new EventHandler(FormTimer_Tick);
-
-                void FormTimer_Tick(object sender2, EventArgs e2)
+                System.Windows.Forms.Timer FormTimer = new System.Windows.Forms.Timer
                 {
-                    if (milSec == 60) { milSec = 00; sec++; }
+                    Interval = 1
+                };
+                FileFounded = false;
+                SearchFormat = 0;
 
-                    if (sec == 60) { sec = 00; min++; }
-
-                    if (min == 60) { min = 00; hour++; }
-
-                    TextBoxTime.Text = $"{hour}h:{min}m:{sec}s:{milSec++}ms ";
-                    if (FileFounded == false)
-                        textBoxActualDirectory.Text = ActualDirectory;
-                    else
-                        textBoxActualDirectory.Text = SearchResult;
-                }
-
-                try
+                if (textBoxFileName.Text.Equals("") & textBoxFileExtension.Text.Equals(""))
+                    MessageBox.Show("Укажите параметры для поиска");
+                else if (textBoxPathString.Text.Length == 0)
+                    MessageBox.Show("Выберите начальную директорию поиска");
+                else
                 {
-                    File.WriteAllText("lastSearch.txt", textBoxPathString.Text);
+                    //Choosing format of searching by the input information  
+                    if (textBoxFileName.Text.Equals("") == false && textBoxFileExtension.Text.Equals("") == false)
+                        SearchFormat = 1;//Format, if u entered file name and file extension
+                    else if (textBoxFileName.Text.Equals("") == false && textBoxFileExtension.Text.Equals("") == true)
+                        SearchFormat = 2;//Format, if u entered only file name
+                    else if (textBoxFileName.Text.Equals("") == true && textBoxFileExtension.Text.Equals("") == false)
+                        SearchFormat = 3; //Format, if u entered only file extension
+                    else if (Stop == true)
+                        SearchFormat = 4;
 
-                    if (textBoxFileName.Text != null || textBoxFileExtension != null)
+                    treeView1.Nodes.Clear();
+                    SearchResult = null;
+                    ActualDirectory = null;
+
+                    TextBoxTime.Text = "0h:0m:0s:0ms";
+                    int milSec, sec, min, hour;
+                    milSec = sec = min = hour = 0;
+
+                    FormTimer.Start();
+                    FormTimer.Tick += new EventHandler(FormTimer_Tick);
+
+                    void FormTimer_Tick(object sender2, EventArgs e2)
                     {
-                        pictureBox1.Visible = true;
-                        pictureBox2.Visible = false;
+                        if (milSec == 60) { milSec = 00; sec++; }
 
-                        await Task.Run(() => АccessibleDirectory(textBoxPathString.Text, textBoxFileName.Text, textBoxFileExtension.Text));// start background searching
+                        if (sec == 60) { sec = 00; min++; }
 
-                        if (SearchResult != null)
+                        if (min == 60) { min = 00; hour++; }
+
+                        TextBoxTime.Text = $"{hour}h:{min}m:{sec}s:{milSec++}ms ";
+                        if (FileFounded == false)
+                            textBoxActualDirectory.Text = ActualDirectory;
+                        else
+                            textBoxActualDirectory.Text = SearchResult;
+                    }
+
+                    try
+                    {
+                        File.WriteAllText("lastSearch.txt", textBoxPathString.Text);
+
+                        if (textBoxFileName.Text != null || textBoxFileExtension != null)
                         {
-                            GC.Collect();
-                            CounterForTree = 0; 
-                            treeView1.Nodes.Add(CreateNodes(SearchResult, SearchResult.Split('\\')[0],textBoxFileName.Text, textBoxFileExtension.Text));                          
+                            pictureBox1.Visible = true;
+                            pictureBox2.Visible = false;
+
+                            await Task.Run(() => АccessibleDirectory(textBoxPathString.Text, textBoxFileName.Text, textBoxFileExtension.Text));// start background searching
+
+                            if (SearchResult != null)
+                            {
+                                GC.Collect();
+                                CounterForTree = 0;
+                                treeView1.Nodes.Add(CreateNodes(SearchResult, SearchResult.Split('\\')[0], textBoxFileName.Text, textBoxFileExtension.Text));
+                            }
+                            else
+                            {
+                                FormTimer.Stop();
+                                GC.Collect();
+                            }
+
                         }
+
                         else
                         {
                             FormTimer.Stop();
-                            GC.Collect();
+                            MessageBox.Show("Пустой поисковый запрос");
                         }
 
-                    }
-                   
-                    else
-                    {
                         FormTimer.Stop();
-                        MessageBox.Show("Пустой поисковый запрос");
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                    finally
+                    {
+                        ReadyToStart = true;
+                        Stop = false;
 
-                    FormTimer.Stop();
+                        if (FileFounded == false)
+                            textBoxActualDirectory.Text = "Подходящих файлов не обнаружено";
+                        else
+                            textBoxActualDirectory.Text = SearchResult;
+                        GC.Collect();
+                        pictureBox1.Visible = false;
+                        pictureBox2.Visible = true;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
-                    if (FileFounded == false)
-                        textBoxActualDirectory.Text = "Подходящих файлов не обнаружено";
-                    else
-                        textBoxActualDirectory.Text = SearchResult;
-                    GC.Collect();
-                    pictureBox1.Visible = false;
-                    pictureBox2.Visible =true;
-                }
+           
+            }
+            else
+            {
+                MessageBox.Show("Поиск уже идёт. Остановите его, и начните новый, в случае необходимости");
             }
         }
 
@@ -330,5 +357,9 @@ namespace Тестовое_приложение_по_поиску_файлов__
             textBoxFileExtension.Clear();
         }
 
+        private void stop_Click(object sender, EventArgs e)
+        {
+            Stop = true;
+        }
     }
 }
