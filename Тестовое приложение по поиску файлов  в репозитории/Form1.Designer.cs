@@ -189,7 +189,7 @@
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(138, 32);
             this.label6.TabIndex = 18;
-            this.label6.Text = "Колличество подходящих файлов ";
+            this.label6.Text = "Количество подходящих файлов ";
             this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.label6.UseCompatibleTextRendering = true;
             // 
